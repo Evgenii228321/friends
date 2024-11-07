@@ -1,76 +1,118 @@
-п»їusing System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-
-namespace WindowsFormsApp1
+namespace WinFormsApp4
 {
     public partial class Form1 : Form
     {
-        private bool dragging;
-        private Point dragCursorPoint; private Point dragFormPoint;
+        private Label resultLabel;
+        private TextBox num1TextBox;
+        private TextBox num2TextBox;
+        private Button addButton;
+        private Button subtractButton;
+        private Button multiplyButton;
+        private Button divideButton;
         public Form1()
         {
             InitializeComponent();
-            this.ClientSize = new Size(800, 800); this.Text = "РџРѕРїС‹С‚";
-            this.FormBorderStyle = FormBorderStyle.None; this.Paint += new PaintEventHandler(MainForm_Paint);
-            this.MouseDown += new MouseEventHandler(Form1_MouseDown); this.MouseMove += new MouseEventHandler(Form1_MouseMove);
-            this.MouseUp += new MouseEventHandler(Form1_MouseUp);
-        }
-        private void Form1_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                dragging = true;
-                dragCursorPoint = Cursor.Position; dragFormPoint = this.Location;
-            }
-        }
-        private void Form1_MouseUp(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                dragging = false;
-            }
-        }
-        private void Form1_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (dragging)
-            {
-                Point dif = Point.Subtract(Cursor.Position, new Size(dragCursorPoint));
-                this.Location = Point.Add(dragFormPoint, new Size(dif));
-            }
-        }
-        private void MainForm_Paint(object sender, PaintEventArgs e)
-        {
+            // Настройка элементов управления
+            resultLabel = new Label();
+            resultLabel.Location = new Point(10, 10);
+            resultLabel.AutoSize = true;
+            resultLabel.Text = "Результат:";
+            Controls.Add(resultLabel);
 
-            BackColor = Color.DarkOliveGreen; int side = Math.Min(ClientSize.Width, ClientSize.Height);
-            int centerX = side / 2; int centerY = side / 2;
-            int outerRadius = side / 2 - 10; double innerRadius = outerRadius / 2;
-            double angle = 3;
-            double angleStep = Math.PI * 2 / 5;
-            Point[] starPoints = new Point[10]; for (int i = 0; i < 5; i++)
-            {
-                int xOuter = (int)(centerX + outerRadius * Math.Cos(angle));
-                int yOuter = (int)(centerY + outerRadius * Math.Sin(angle)); starPoints[i * 2] = new Point(xOuter, yOuter);
-                int xInner = (int)(centerX + innerRadius * Math.Cos(angle + angleStep / 2));
-                int yInner = (int)(centerY + innerRadius * Math.Sin(angle + angleStep / 2)); starPoints[i * 2 + 1] = new Point(xInner, yInner);
-                angle += angleStep;
-            }
-            GraphicsPath starPath = new GraphicsPath(); starPath.AddPolygon(starPoints);
-            this.Region = new Region(starPath);
+            num1TextBox = new TextBox();
+            num1TextBox.Location = new Point(10, 40);
+            num1TextBox.Size = new Size(100, 20);
+            Controls.Add(num1TextBox);
+
+            num2TextBox = new TextBox();
+            num2TextBox.Location = new Point(120, 40);
+            num2TextBox.Size = new Size(100, 20);
+            Controls.Add(num2TextBox);
+
+            addButton = new Button();
+            addButton.Location = new Point(10, 80);
+            addButton.Text = "+";
+            addButton.Click += AddButton_Click;
+            Controls.Add(addButton);
+
+            subtractButton = new Button();
+            subtractButton.Location = new Point(80, 80);
+            subtractButton.Text = "-";
+            subtractButton.Click += SubtractButton_Click;
+            Controls.Add(subtractButton);
+
+            multiplyButton = new Button();
+            multiplyButton.Location = new Point(150, 80);
+            multiplyButton.Text = "*";
+            multiplyButton.Click += MultiplyButton_Click;
+            Controls.Add(multiplyButton);
+
+            divideButton = new Button();
+            divideButton.Location = new Point(220, 80);
+            divideButton.Text = "/";
+            divideButton.Click += DivideButton_Click;
+            Controls.Add(divideButton);
         }
-        private void Form1_Load(object sender, EventArgs e)
-        { }
 
-        private void Form1_Load_1(object sender, EventArgs e)
+        private void AddButton_Click(object sender, EventArgs e)
         {
+            CalculateResult("+");
+        }
 
+        private void SubtractButton_Click(object sender, EventArgs e)
+        {
+            CalculateResult("-");
+        }
+
+        private void MultiplyButton_Click(object sender, EventArgs e)
+        {
+            CalculateResult("*");
+        }
+
+        private void DivideButton_Click(object sender, EventArgs e)
+        {
+            CalculateResult("/");
+        }
+
+        private void CalculateResult(string operation)
+        {
+            try
+            {
+                double num1 = Convert.ToDouble(num1TextBox.Text);
+                double num2 = Convert.ToDouble(num2TextBox.Text);
+
+                double result = 0;
+                switch (operation)
+                {
+                    case "+":
+                        result = num1 + num2;
+                        break;
+                    case "-":
+                        result = num1 - num2;
+                        break;
+                    case "*":
+                        result = num1 * num2;
+                        break;
+                    case "/":
+                        if (num2 == 0)
+                        {
+                            MessageBox.Show("Деление на ноль невозможно!");
+                            return;
+                        }
+                        result = num1 / num2;
+                        break;
+                }
+
+                resultLabel.Text = $"Результат: {result}";
+            }
+            catch (FormatException)
+            {
+                MessageBox.Show("Неверный формат ввода!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка: {ex.Message}");
+            }
         }
     }
 }
